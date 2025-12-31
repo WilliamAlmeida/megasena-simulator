@@ -1,0 +1,328 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(100, 116, 139, 0.4);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(100, 116, 139, 0.3);
+    border: none;
+    color: #94a3b8;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.closeBtn:hover {
+    background: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+}
+
+.header {
+    padding: 32px 24px 24px;
+    text-align: center;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.title {
+    color: #e2e8f0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.drawNumbers {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.drawNumber {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+.searchStats {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 16px;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+}
+
+.statLabel {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.statValue {
+    color: #06b6d4;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.toggleAttemptsBtn {
+    width: 100%;
+    padding: 10px;
+    background: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 10px;
+    color: #06b6d4;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggleAttemptsBtn:hover {
+    background: rgba(6, 182, 212, 0.25);
+}
+
+.allAttempts {
+    margin-top: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 12px;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 12px;
+}
+
+.attemptRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.attemptRow:last-child {
+    border-bottom: none;
+}
+
+.attemptNum {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 40px;
+}
+
+.attemptNumbers {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.attemptNumber {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(100, 116, 139, 0.3);
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    padding: 24px;
+}
+
+.noWinners {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.noWinnersIcon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.noWinners p {
+    color: #e2e8f0;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.noWinnersHint {
+    color: #64748b !important;
+    font-size: 0.95rem !important;
+}
+
+.prizeSection {
+    margin-bottom: 24px;
+}
+
+.prizeTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding: 10px 16px;
+    border-radius: 12px;
+}
+
+.prizeTitle.sena {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.2));
+    color: #fbbf24;
+}
+
+.prizeTitle.quina {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(124, 58, 237, 0.2));
+    color: #a78bfa;
+}
+
+.prizeTitle.quadra {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(59, 130, 246, 0.2));
+    color: #60a5fa;
+}
+
+.winnersList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.winnerCard {
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid;
+}
+
+.winnerCard.senaCard {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.winnerCard.quinaCard {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.winnerCard.quadraCard {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: rgba(37, 99, 235, 0.3);
+}
+
+.winnerName {
+    display: block;
+    color: #e2e8f0;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.winnerNumbers {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.winnerNumber {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(100, 116, 139, 0.3);
+    border: 1px solid rgba(100, 116, 139, 0.5);
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.winnerNumber.matched {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #10b981;
+    color: #fff;
+}
+
+.summary {
+    text-align: center;
+    padding-top: 16px;
+    border-top: 1px solid rgba(100, 116, 139, 0.2);
+    color: #94a3b8;
+}
+
+.summary strong {
+    color: #10b981;
+}

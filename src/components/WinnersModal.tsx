@@ -21,6 +21,13 @@ export function WinnersModal({ winners, drawNumbers, searchStats, onClose }: Win
     const quinaWinners = winners.filter(w => w.prize === 'quina');
     const quadraWinners = winners.filter(w => w.prize === 'quadra');
     const [showAllAttempts, setShowAllAttempts] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
+
+    const totalPages = searchStats ? Math.ceil(searchStats.allAttempts.length / ITEMS_PER_PAGE) : 0;
+    const currentAttempts = searchStats
+        ? searchStats.allAttempts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+        : [];
 
     return (
         <div className={styles.overlay} onClick={onClose}>
@@ -61,18 +68,45 @@ export function WinnersModal({ winners, drawNumbers, searchStats, onClose }: Win
                             </button>
                             {showAllAttempts && (
                                 <div className={styles.allAttempts}>
-                                    {searchStats.allAttempts.map((attempt, idx) => (
-                                        <div key={idx} className={styles.attemptRow}>
-                                            <span className={styles.attemptNum}>#{idx + 1}</span>
-                                            <div className={styles.attemptNumbers}>
-                                                {attempt.map((num, nidx) => (
-                                                    <span key={nidx} className={styles.attemptNumber}>
-                                                        {num.toString().padStart(2, '0')}
-                                                    </span>
-                                                ))}
-                                            </div>
+                                    <div className={styles.attemptsGrid}>
+                                        {currentAttempts.map((attempt, idx) => {
+                                            const realIdx = (currentPage - 1) * ITEMS_PER_PAGE + idx;
+                                            return (
+                                                <div key={realIdx} className={styles.attemptRow}>
+                                                    <span className={styles.attemptNum}>#{realIdx + 1}</span>
+                                                    <div className={styles.attemptNumbers}>
+                                                        {attempt.map((num, nidx) => (
+                                                            <span key={nidx} className={styles.attemptNumber}>
+                                                                {num.toString().padStart(2, '0')}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {totalPages > 1 && (
+                                        <div className={styles.pagination}>
+                                            <button
+                                                disabled={currentPage === 1}
+                                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                                className={styles.pageBtn}
+                                            >
+                                                Previous
+                                            </button>
+                                            <span className={styles.pageInfo}>
+                                                Page {currentPage} of {totalPages}
+                                            </span>
+                                            <button
+                                                disabled={currentPage === totalPages}
+                                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                                className={styles.pageBtn}
+                                            >
+                                                Next
+                                            </button>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -16,6 +16,11 @@ export interface DrawResult {
         attempts: number;
         timeMs: number;
         allAttempts: number[][];
+        intermediateWinners?: {
+            drawNumbers: number[];
+            winners: Winner[];
+            attempt: number;
+        }[];
     };
 }
 

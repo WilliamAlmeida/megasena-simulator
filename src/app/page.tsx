@@ -21,14 +21,16 @@ export default function Home() {
     removeGame,
     clearGames,
     performDraw,
-    setManualDraw
+    setManualDraw,
+    isDrawing,
+    currentAttempts
   } = useMegaSena();
 
   const [showWinners, setShowWinners] = useState(false);
   const [activeTab, setActiveTab] = useState<'games' | 'add' | 'draw'>('games');
 
-  const handlePerformDraw = (mode: DrawMode) => {
-    performDraw(mode);
+  const handlePerformDraw = async (mode: DrawMode) => {
+    await performDraw(mode);
     setShowWinners(true);
   };
 
@@ -169,6 +171,8 @@ export default function Home() {
               onPerformDraw={handlePerformDraw}
               onManualDraw={handleManualDraw}
               hasGames={games.length > 0}
+              isDrawing={isDrawing}
+              currentAttempts={currentAttempts}
             />
           </section>
         )}

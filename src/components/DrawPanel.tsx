@@ -10,9 +10,11 @@ interface DrawPanelProps {
     onPerformDraw: (mode: DrawMode) => void;
     onManualDraw: (numbers: number[]) => void;
     hasGames: boolean;
+    isDrawing?: boolean;
+    currentAttempts?: number;
 }
 
-export function DrawPanel({ onPerformDraw, onManualDraw, hasGames }: DrawPanelProps) {
+export function DrawPanel({ onPerformDraw, onManualDraw, hasGames, isDrawing, currentAttempts }: DrawPanelProps) {
     const [isManual, setIsManual] = useState(false);
     const [manualNumbers, setManualNumbers] = useState<number[]>([]);
     const [error, setError] = useState('');
@@ -37,11 +39,24 @@ export function DrawPanel({ onPerformDraw, onManualDraw, hasGames }: DrawPanelPr
         <div className={styles.container}>
             <h3 className={styles.title}>🎰 Realizar Sorteio</h3>
 
+            {isDrawing && (
+                <div className={styles.loadingOverlay}>
+                    <div className={styles.spinner}></div>
+                    <p className={styles.loadingText}>Realizando Sorteio...</p>
+                    {currentAttempts !== undefined && currentAttempts > 0 && (
+                        <p className={styles.attemptsCount}>
+                            Tentativas: {currentAttempts.toLocaleString('pt-BR')}
+                        </p>
+                    )}
+                </div>
+            )}
+
             {!isManual ? (
                 <div className={styles.buttonGroup}>
                     <button
                         className={`${styles.drawBtn} ${styles.random}`}
                         onClick={() => handleRandomDraw('random')}
+                        disabled={isDrawing}
                     >
                         <span className={styles.btnIcon}>🎲</span>
                         <span className={styles.btnText}>Sorteio Aleatório</span>
@@ -51,7 +66,7 @@ export function DrawPanel({ onPerformDraw, onManualDraw, hasGames }: DrawPanelPr
                     <button
                         className={`${styles.drawBtn} ${styles.fromGames}`}
                         onClick={() => handleRandomDraw('from-games')}
-                        disabled={!hasGames}
+                        disabled={!hasGames || isDrawing}
                     >
                         <span className={styles.btnIcon}>📋</span>
                         <span className={styles.btnText}>Aleatório dos Jogos</span>
@@ -61,7 +76,7 @@ export function DrawPanel({ onPerformDraw, onManualDraw, hasGames }: DrawPanelPr
                     <button
                         className={`${styles.drawBtn} ${styles.untilWinner}`}
                         onClick={() => handleRandomDraw('until-winner')}
-                        disabled={!hasGames}
+                        disabled={!hasGames || isDrawing}
                     >
                         <span className={styles.btnIcon}>🔍</span>
                         <span className={styles.btnText}>Buscar Ganhador</span>
@@ -71,6 +86,7 @@ export function DrawPanel({ onPerformDraw, onManualDraw, hasGames }: DrawPanelPr
                     <button
                         className={`${styles.drawBtn} ${styles.manual}`}
                         onClick={() => setIsManual(true)}
+                        disabled={isDrawing}
                     >
                         <span className={styles.btnIcon}>✏️</span>
                         <span className={styles.btnText}>Resultado Manual</span>

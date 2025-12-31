@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { Game, DrawResult, Winner, RandomMode, DrawMode } from '@/types';
 import {
@@ -18,6 +18,8 @@ const DRAW_KEY = 'megasena_last_draw';
 export function useMegaSena() {
     const [games, setGames] = useLocalStorage<Game[]>(GAMES_KEY, []);
     const [lastDraw, setLastDraw] = useLocalStorage<DrawResult | null>(DRAW_KEY, null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [currentAttempts, setCurrentAttempts] = useState(0);
 
     // Add a new game
     const addGame = useCallback((playerName: string, numbers: number[]) => {
@@ -67,31 +69,43 @@ export function useMegaSena() {
     }, [setGames]);
 
     // Perform a draw
-    const performDraw = useCallback((mode: DrawMode = 'random') => {
-        if (mode === 'until-winner') {
-            const result = drawUntilWinner(games);
+    const performDraw = useCallback(async (mode: DrawMode = 'random') => {
+        setIsDrawing(true);
+        setCurrentAttempts(0);
+
+        try {
+            if (mode === 'until-winner') {
+                // For async draw, we update state while running
+                const result = await drawUntilWinner(games, (attempts) => {
+                    setCurrentAttempts(attempts);
+                });
+
+                const draw: DrawResult = {
+                    id: generateId(),
+                    numbers: result.numbers,
+                    drawnAt: new Date().toISOString(),
+                    searchStats: {
+                        attempts: result.attempts,
+                        timeMs: result.timeMs,
+                        allAttempts: result.allAttempts
+                    }
+                };
+                setLastDraw(draw);
+                return draw;
+            }
+
+            // Standard sync draw
+            const numbers = generateDrawNumbers(mode, games);
             const draw: DrawResult = {
                 id: generateId(),
-                numbers: result.numbers,
-                drawnAt: new Date().toISOString(),
-                searchStats: {
-                    attempts: result.attempts,
-                    timeMs: result.timeMs,
-                    allAttempts: result.allAttempts
-                }
+                numbers,
+                drawnAt: new Date().toISOString()
             };
             setLastDraw(draw);
             return draw;
+        } finally {
+            setIsDrawing(false);
         }
-
-        const numbers = generateDrawNumbers(mode, games);
-        const draw: DrawResult = {
-            id: generateId(),
-            numbers,
-            drawnAt: new Date().toISOString()
-        };
-        setLastDraw(draw);
-        return draw;
     }, [games, setLastDraw]);
 
     // Set manual draw numbers
@@ -145,6 +159,8 @@ export function useMegaSena() {
         removeGame,
         clearGames,
         performDraw,
-        setManualDraw
+        setManualDraw,
+        isDrawing,
+        currentAttempts
     };
 }

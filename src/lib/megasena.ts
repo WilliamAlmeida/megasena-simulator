@@ -126,43 +126,67 @@ export function generateDrawNumbers(
 }
 
 // Draw until finding a winner
-export function drawUntilWinner(games: Game[]): {
+// Draw until finding a winner
+// Draw until finding a winner (Async with UI yielding)
+export async function drawUntilWinner(
+    games: Game[],
+    onProgress?: (attempts: number) => void
+): Promise<{
     numbers: number[];
     attempts: number;
     timeMs: number;
     allAttempts: number[][];
-} {
+}> {
     const startTime = performance.now();
     const allAttempts: number[][] = [];
     let attempts = 0;
-    const MAX_ATTEMPTS = 100000; // Safety limit
+    const MAX_TIME_MS = 120000; // 2 minutes
+    const CHUNK_SIZE = 2000; // Check time/yield every X attempts
 
-    while (attempts < MAX_ATTEMPTS) {
-        attempts++;
-        const numbers = generateDrawNumbers('random', games);
-        allAttempts.push(numbers);
+    while (true) {
+        // Run a chunk of attempts synchronously for performance
+        const chunkStartTime = performance.now();
+        for (let i = 0; i < CHUNK_SIZE; i++) {
+            attempts++;
+            const numbers = generateDrawNumbers('random', games);
+            allAttempts.push(numbers);
 
-        // Check if we have any winners
-        const winners = findWinners(games, numbers);
-        if (winners.length > 0) {
-            const endTime = performance.now();
+            // Check if we have any winners
+            const currentWinners = findWinners(games, numbers);
+
+            // Check for Sena (6 matches) specifically
+            const hasSena = currentWinners.some(w => w.matches === 6);
+
+            if (hasSena) {
+                const endTime = performance.now();
+                return {
+                    numbers,
+                    attempts,
+                    timeMs: Math.round(endTime - startTime),
+                    allAttempts
+                };
+            }
+        }
+
+        // Check time limit
+        const currentTime = performance.now();
+        if (currentTime - startTime > MAX_TIME_MS) {
             return {
-                numbers,
+                numbers: allAttempts[allAttempts.length - 1], // Return last attempt
                 attempts,
-                timeMs: Math.round(endTime - startTime),
+                timeMs: Math.round(currentTime - startTime),
                 allAttempts
             };
         }
-    }
 
-    // If we hit max attempts, return the last draw anyway
-    const endTime = performance.now();
-    return {
-        numbers: allAttempts[allAttempts.length - 1],
-        attempts,
-        timeMs: Math.round(endTime - startTime),
-        allAttempts
-    };
+        // Report progress
+        if (onProgress) {
+            onProgress(attempts);
+        }
+
+        // Yield to event loop to allow UI updates
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
 }
 
 // Check matches between game and draw

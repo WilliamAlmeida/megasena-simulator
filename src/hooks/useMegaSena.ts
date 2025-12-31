@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { Game, DrawResult, Winner, RandomMode, DrawMode } from '@/types';
 import {
@@ -17,7 +17,50 @@ const DRAW_KEY = 'megasena_last_draw';
 
 export function useMegaSena() {
     const [games, setGames] = useLocalStorage<Game[]>(GAMES_KEY, []);
-    const [lastDraw, setLastDraw] = useLocalStorage<DrawResult | null>(DRAW_KEY, null);
+    // Manual handling for lastDraw to avoid QuotaExceededError with large history
+    const [lastDraw, setLastDrawState] = useState<DrawResult | null>(null);
+
+    // Load lastDraw from storage on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem(DRAW_KEY);
+            if (stored) {
+                try {
+                    setLastDrawState(JSON.parse(stored));
+                } catch (e) {
+                    console.error('Failed to parse last draw', e);
+                }
+            }
+        }
+    }, []);
+
+    // Custom setter that truncates history for storage
+    const setLastDraw = useCallback((draw: DrawResult | null) => {
+        setLastDrawState(draw);
+
+        if (typeof window !== 'undefined') {
+            if (draw) {
+                try {
+                    // Clone to safely modify for storage without affecting state
+                    const drawToStore = { ...draw };
+
+                    // Truncate allAttempts if too large (keep last 5000)
+                    if (drawToStore.searchStats && drawToStore.searchStats.allAttempts.length > 5000) {
+                        drawToStore.searchStats = {
+                            ...drawToStore.searchStats,
+                            allAttempts: drawToStore.searchStats.allAttempts.slice(-5000)
+                        };
+                    }
+
+                    localStorage.setItem(DRAW_KEY, JSON.stringify(drawToStore));
+                } catch (error) {
+                    console.error('Failed to save last draw to storage:', error);
+                }
+            } else {
+                localStorage.removeItem(DRAW_KEY);
+            }
+        }
+    }, []);
     const [isDrawing, setIsDrawing] = useState(false);
     const [currentAttempts, setCurrentAttempts] = useState(0);
 
